@@ -1,3 +1,36 @@
-- name: Publish (Создание .exe)
-  # Собираем всё в один файл, встраивая нужные библиотеки
-  run: dotnet publish --configuration Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ./publish_output
+name: Build Square Black and Green
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build Release
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Publish (Создание .exe)
+      run: dotnet publish --configuration Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ./publish_output
+
+    - name: Upload Artifact (Загрузка готового билда)
+      uses: actions/upload-artifact@v4
+      with:
+        name: ge-game-windows
+        path: ./publish_output/
