@@ -60,7 +60,7 @@ public class DisclaimerForm : Form
 
     private void LoadFonts()
     {
-        string path = Path.Combine(AppContext.BaseDirectory, "Assets", "MonoDetermination.ttf");
+        string path = Path.Combine(AppContext.BaseDirectory, "Assets", "Monodetermination.ttf");
         if (File.Exists(path))
         {
             _fonts.AddFontFile(path);
