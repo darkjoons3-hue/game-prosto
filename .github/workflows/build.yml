@@ -1,0 +1,37 @@
+name: Build Square Black and Green
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # Позволяет запускать сборку вручную кнопкой в интерфейсе
+
+jobs:
+  build:
+    runs-on: windows-latest # Обязательно Windows для WinForms
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x' # Используем .NET 8, как в нашем .csproj
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build Release
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Publish (Создание .exe)
+      # Эта команда собирает все файлы игры в одну папку для удобного скачивания
+      run: dotnet publish --configuration Release -r win-x64 --self-contained false -o ./publish_output
+
+    - name: Upload Artifact (Загрузка готового билда)
+      uses: actions/upload-artifact@v4
+      with:
+        name: ge-game-windows
+        path: ./publish_output/
